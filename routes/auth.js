@@ -16,7 +16,7 @@ router.get('/protected', requireLogin, (req, res) => {
 })
 
 //signup
-router.post('/signup', (req, res) => {
+router.post('/Signup', (req, res) => {
     const { name, email, password } = req.body
     if (!email || !password || !name) {
         return res.status(400).json({
@@ -55,7 +55,7 @@ router.post('/signup', (req, res) => {
 })
 
 //signin
-router.post('/signin', (req, res) => {
+router.post('/Signin', (req, res) => {
     const { email, password } = req.body
     if (!email || !password) {
         res.status(400).json({ error: "Please add email or password" })
