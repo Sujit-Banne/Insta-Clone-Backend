@@ -1,11 +1,15 @@
-const express = require('express')
-const router = express.Router()
-const mongoose = require('mongoose')
-const User = mongoose.model('User')
-const bcrypt = require('bcryptjs')
-const jwt = require('jsonwebtoken')
-const { JWT_SECRET } = require('../config/keys')
-const requireLogin = require('../middleware/requireLogin')
+const express = require('express');
+const router = express.Router();
+const cors = require('cors');
+const mongoose = require('mongoose');
+const User = mongoose.model('User');
+const bcrypt = require('bcryptjs');
+const jwt = require('jsonwebtoken');
+const { JWT_SECRET } = require('../config/keys');
+const requireLogin = require('../middleware/requireLogin');
+
+// Use cors middleware
+router.use(cors());
 //get resource only when user login (matching token)
 router.get('/protected', requireLogin, (req, res) => {
     res.send('hello')
