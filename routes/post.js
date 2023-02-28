@@ -5,14 +5,26 @@ const Post = mongoose.model("Post")
 const requireLogin = require('../middleware/requireLogin')
 
 //get all post
-router.get('/allpost', requireLogin, (req, res) => {
-    Post.find()
-        .populate("postedby", "_id name")//to get postedby and get only id and name
-        .then(post => {
-            res.json({ post })
+router.get('/allpost', requireLogin, async (req, res) => {
+    try {
+        const posts = await Post.find()
+            .populate('postedby', '_id name')
+            .sort('-date');
+        res.json({ posts });
+    } catch (err) {
+        console.log(err);
+    }
+});
+
+//get data of user logged in
+router.get('/mypost', requireLogin, (req, res) => {
+    Post.find({ postedBy: req.user._id })
+        .populate("postedby", "_id name")
+        .then(mypost => {
+            res.json({ mypost })
         })
-        .catch(err => {
-            console.log(err);
+        .catch(error => {
+            console.log(error);
         })
 })
 
@@ -39,16 +51,6 @@ router.post("/createpost", requireLogin, (req, res) => {
         })
 })
 
-//get data of user logged in
-router.get('/mypost', requireLogin, (req, res) => {
-    Post.find({ postedBy: req.user._id })
-        .populate("postedby", "_id name")
-        .then(mypost => {
-            res.json({ mypost })
-        })
-        .catch(error => {
-            console.log(error);
-        })
-})
+
 
 module.exports = router

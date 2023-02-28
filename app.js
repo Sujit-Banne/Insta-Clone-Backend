@@ -1,16 +1,7 @@
 const express = require('express')
-const cors = require('cors');
+const cors = require("cors")
 const app = express()
-const mongoose = require('mongoose')
-const PORT = process.env.PORT || 4000
-const { MONGO_URI } = require('./config/keys')
-// enable CORS
-app.use(cors());
-const corsOptions = {
-    origin: 'https://insta-clone-frontend-ls9b.onrender.com'
-};
-
-app.use(cors(corsOptions));
+app.use(cors())
 //schema
 require('./models/user')
 require('./models/post')
@@ -21,23 +12,27 @@ app.use(express.json())
 app.use(require('./routes/auth'))
 app.use(require('./routes/post'))
 
+const mongoose = require('mongoose')
+const dotenv = require('dotenv')
+dotenv.config({ path: './env' })
+const PORT = process.env.PORT || 4000
+const requireLogin = require('./middleware/requireLogin');
+
+
+
 //CONNECTING TO MONGODB
 mongoose.set('strictQuery', true);
-mongoose.connect(MONGO_URI)
+mongoose.connect(process.env.MONGO_URI, {
+    useNewUrlParser: true,
+    useUnifiedTopology: true,
+    useFindAndModify: false
+})
 mongoose.connection.on('connected', () => {
     console.log('connected to mongoDb');
 })
 mongoose.connection.on('eroor', (err) => {
     console.log('error connecting ', err);
 })
-
-if (process.env.NODE_ENV == 'production') {
-    app.use(express.static('frontend/build'))
-    const path = require('path')
-    app.get('*', (req, res) => {
-        res.sendFile(path.resolve(_dirname, 'frontend', 'build', 'index.html'))
-    })
-}
 
 //listening to SERVER
 app.listen(PORT, () => {

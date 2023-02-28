@@ -1,15 +1,15 @@
 const express = require('express');
 const router = express.Router();
-const cors = require('cors');
 const mongoose = require('mongoose');
 const User = mongoose.model('User');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
-const { JWT_SECRET } = require('../config/keys');
+const dotenv = require('dotenv')
+dotenv.config({ path: '../env' })
+const jwt_sec = process.env.JWT_SECRET;
 const requireLogin = require('../middleware/requireLogin');
 
-// Use cors middleware
-router.use(cors());
+
 //get resource only when user login (matching token)
 router.get('/protected', requireLogin, (req, res) => {
     res.send('hello')
@@ -19,14 +19,14 @@ router.get('/protected', requireLogin, (req, res) => {
 router.post('/signup', (req, res) => {
     const { name, email, password } = req.body
     if (!email || !password || !name) {
-        return res.status(422).json({
+        return res.status(400).json({
             error: "please add all the fields"
         })
     }
     User.findOne({ email: email })
         .then((savedUser) => {
             if (savedUser) {
-                return res.status(422).json({
+                return res.status(400).json({
                     error: "user already exists with that email"
                 })
             }
@@ -43,13 +43,14 @@ router.post('/signup', (req, res) => {
                             res.json({ message: "saved successfully" })
                         })
                         .catch(err => {
-                            res.json({ error: err })
                             console.log(err);
+                            res.status(500).json({ error: "Internal server error" });
                         })
                 })
         })
         .catch(err => {
             console.log(err);
+            res.status(500).json({ error: "Internal server error" });
         })
 })
 
@@ -57,12 +58,12 @@ router.post('/signup', (req, res) => {
 router.post('/signin', (req, res) => {
     const { email, password } = req.body
     if (!email || !password) {
-        res.status(422).json({ error: "Please add email or password" })
+        res.status(400).json({ error: "Please add email or password" })
     }
     User.findOne({ email: email })
         .then((savedUser) => {
             if (!savedUser) {
-                return res.status(422).json({ errr: "Invalid Email Or Password" })
+                return res.status(401).json({ errr: "Invalid Email Or Password" })
             }
             //to compare password
             bcrypt.compare(password, savedUser.password)
@@ -70,7 +71,7 @@ router.post('/signin', (req, res) => {
                     if (doMatch) {
                         // res.json({ message: "successfully Signed in" })
                         //sign method to generate token on basis of user id
-                        const token = jwt.sign({ _id: savedUser._id }, JWT_SECRET)
+                        const token = jwt.sign({ _id: savedUser._id }, jwt_sec)
                         const { _id, name, email } = savedUser
                         return res.json({ token, user: { _id, name, email } })
                     } else {
@@ -79,6 +80,7 @@ router.post('/signin', (req, res) => {
                 })
                 .catch(err => {
                     console.log(err);
+                    res.status(500).json({ error: "Internal server error" });
                 })
         })
 })
