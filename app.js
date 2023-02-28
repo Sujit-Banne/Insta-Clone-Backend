@@ -11,10 +11,9 @@ app.use(express.json())
 //router
 app.use(require('./routes/auth'))
 app.use(require('./routes/post'))
-
 const mongoose = require('mongoose')
 const dotenv = require('dotenv')
-dotenv.config({ path: './env' })
+require('dotenv').config()
 const PORT = process.env.PORT || 4000
 const requireLogin = require('./middleware/requireLogin');
 
@@ -22,11 +21,7 @@ const requireLogin = require('./middleware/requireLogin');
 
 //CONNECTING TO MONGODB
 mongoose.set('strictQuery', true);
-mongoose.connect(process.env.MONGO_URI, {
-    useNewUrlParser: true,
-    useUnifiedTopology: true,
-    useFindAndModify: false
-})
+mongoose.connect(process.env.MONGO_URI)
 mongoose.connection.on('connected', () => {
     console.log('connected to mongoDb');
 })

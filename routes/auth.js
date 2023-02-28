@@ -6,7 +6,6 @@ const bcrypt = require("bcrypt");
 const jwt = require('jsonwebtoken')
 require('dotenv').config()
 const jwt_sec = process.env.JWT_SECRET;
-console.log(jwt_sec);
 const requireLogin = require('../middleware/requireLogin')
 
 
