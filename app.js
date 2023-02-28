@@ -1,9 +1,16 @@
 const express = require('express')
+const cors = require('cors');
 const app = express()
 const mongoose = require('mongoose')
 const PORT = process.env.PORT || 4000
 const { MONGO_URI } = require('./config/keys')
+// enable CORS
+app.use(cors());
+const corsOptions = {
+    origin: 'https://insta-clone-frontend-ls9b.onrender.com'
+};
 
+app.use(cors(corsOptions));
 //schema
 require('./models/user')
 require('./models/post')
